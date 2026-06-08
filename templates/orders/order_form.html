@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% block title %}Оформить заказ — Bubo 3D Store{% endblock %}
+
+{% block content %}
+<div class="container page-content">
+  <h1 class="page-title">Оформить заказ</h1>
+  <p class="page-subtitle">Заполните форму — мы свяжемся с вами для подтверждения.</p>
+
+  <div class="form-wrap">
+    <form method="post" class="order-form">
+      {% csrf_token %}
+
+      {% for field in form %}
+      <div class="form-group {% if field.errors %}form-group--error{% endif %}">
+        <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+        {{ field }}
+        {% if field.errors %}
+        <ul class="form-errors">
+          {% for error in field.errors %}<li>{{ error }}</li>{% endfor %}
+        </ul>
+        {% endif %}
+        {% if field.help_text %}
+        <p class="form-help">{{ field.help_text }}</p>
+        {% endif %}
+      </div>
+      {% endfor %}
+
+      <button type="submit" class="btn btn--primary btn--large btn--full">
+        Отправить заказ
+      </button>
+      <p class="form-note">Нажимая кнопку, вы соглашаетесь с условиями обработки персональных данных.</p>
+    </form>
+
+    <div class="order-alt">
+      <p>Или быстро напишите нам:</p>
+      <a href="https://t.me/BuboStore" class="btn btn--outline">Telegram</a>
+      <a href="https://wa.me/996700000000" class="btn btn--outline">WhatsApp</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

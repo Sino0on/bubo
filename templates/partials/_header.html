@@ -1,0 +1,22 @@
+{% load static %}
+<header class="header">
+  <div class="container header__inner">
+    <a href="{% url 'home' %}" class="header__logo">
+      <img src="{% static 'img/logo.png' %}" alt="Bubo 3D Store" class="header__logo-img">
+    </a>
+
+    <nav class="nav" id="nav">
+      <a href="{% url 'catalog:list' %}" class="nav__link">Каталог</a>
+      {% for col in all_collections %}
+      <a href="{% url 'catalog:list' %}?collection={{ col.slug }}" class="nav__link nav__link--collection">{{ col.name }}</a>
+      {% endfor %}
+      <a href="{% url 'pages:about' %}" class="nav__link">О бренде</a>
+      <a href="{% url 'pages:delivery' %}" class="nav__link">Доставка</a>
+      <a href="{% url 'pages:contacts' %}" class="nav__link">Контакты</a>
+    </nav>
+
+    <button class="burger" id="burger" aria-label="Меню" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>

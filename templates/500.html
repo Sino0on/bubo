@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Ошибка сервера (500) — Bubo 3D Store{% endblock %}
+{% block meta_robots %}noindex, nofollow{% endblock %}
+
+{% block content %}
+<div class="container page-content" style="text-align:center; padding: 5rem 1rem;">
+  <img src="{% static 'img/logo.png' %}" alt="Bubo 3D Store" style="width:120px; margin: 0 auto 1.5rem; opacity:.25;">
+  <h1 style="font-size: 5rem; font-weight:800; line-height:1; margin-bottom:.5rem;">500</h1>
+  <h2 style="margin-bottom:1rem;">Что-то пошло не так</h2>
+  <p style="color: var(--color-text-muted); max-width:420px; margin: 0 auto 2rem;">
+    Мы уже знаем об этой проблеме и скоро её исправим. Попробуйте обновить страницу или зайдите позже.
+  </p>
+  <a href="/" class="btn btn--primary btn--large">На главную</a>
+</div>
+{% endblock %}

@@ -1,0 +1,7 @@
+{% for color in colors %}
+<label class="color-swatch" title="{{ color.name }}">
+  <input type="radio" name="color_id" value="{{ color.id }}" {% if selected_color_id == color.id|stringformat:"i" %}checked{% endif %}>
+  <span class="color-swatch__dot" style="background:{{ color.hex }}"></span>
+  <span class="color-swatch__name">{{ color.name }}</span>
+</label>
+{% endfor %}

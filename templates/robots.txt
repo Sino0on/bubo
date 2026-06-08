@@ -1,0 +1,18 @@
+User-agent: *
+
+Disallow: /admin/
+Disallow: /order/
+Disallow: /order/success/
+Disallow: /catalog/?q=
+Disallow: /catalog/?color=
+Disallow: /catalog/?price_min=
+Disallow: /catalog/?price_max=
+Disallow: /catalog/?sort=
+Disallow: /catalog/?page=
+
+Allow: /catalog/
+Allow: /
+
+Crawl-delay: 1
+
+Sitemap: {{ SITE_URL }}/sitemap.xml

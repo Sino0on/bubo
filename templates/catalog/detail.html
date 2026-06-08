@@ -1,0 +1,249 @@
+{% extends 'base.html' %}
+{% load static bubo_tags %}
+
+{% block title %}{{ product.name }} — купить в Бишкеке | Bubo 3D Store{% endblock %}
+{% block meta_description %}{{ product.description|truncatewords:25 }} Цена: {{ product.price }} сом. Доставка по Бишкеку. Bubo 3D Store.{% endblock %}
+{% block meta_keywords %}{{ product.name }}, 3D печать Бишкек, {% if product.collection %}{{ product.collection.name }}, {% endif %}купить {{ product.name }}, Bubo 3D Store{% endblock %}
+
+{% block og_type %}product{% endblock %}
+{% block og_title %}{{ product.name }} — Bubo 3D Store{% endblock %}
+{% block og_description %}{{ product.description|truncatewords:25 }}{% endblock %}
+{% with img=product.main_image %}
+{% block og_image %}{% if img %}{{ SITE_URL }}{{ img.image.url }}{% else %}{{ SITE_URL }}{% static 'img/logo.png' %}{% endif %}{% endblock %}
+{% endwith %}
+
+{% block tw_title %}{{ product.name }} — Bubo 3D Store{% endblock %}
+{% block tw_description %}{{ product.description|truncatewords:25 }}{% endblock %}
+{% with img=product.main_image %}
+{% block tw_image %}{% if img %}{{ SITE_URL }}{{ img.image.url }}{% else %}{{ SITE_URL }}{% static 'img/logo.png' %}{% endif %}{% endblock %}
+{% endwith %}
+
+{% block canonical %}{{ SITE_URL }}{{ product.get_absolute_url }}{% endblock %}
+
+{% block extra_jsonld %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Product",
+      "name": "{{ product.name }}",
+      "description": "{{ product.description|escapejs }}",
+      {% with img=product.main_image %}{% if img %}
+      "image": "{{ SITE_URL }}{{ img.image.url }}",
+      {% endif %}{% endwith %}
+      "sku": "{{ product.slug }}",
+      "brand": {
+        "@type": "Brand",
+        "name": "Bubo 3D Store"
+      },
+      {% if product.material %}
+      "material": "{{ product.material }}",
+      {% endif %}
+      "offers": {
+        "@type": "Offer",
+        "url": "{{ SITE_URL }}{{ product.get_absolute_url }}",
+        "priceCurrency": "KGS",
+        "price": "{{ product.price }}",
+        "availability": "{% if product.in_stock %}https://schema.org/InStock{% else %}https://schema.org/PreOrder{% endif %}",
+        "seller": {
+          "@type": "Organization",
+          "name": "Bubo 3D Store"
+        }
+      }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Главная",
+          "item": "{{ SITE_URL }}/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Каталог",
+          "item": "{{ SITE_URL }}/catalog/"
+        }{% if product.collection %},
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "{{ product.collection.name }}",
+          "item": "{{ SITE_URL }}{{ product.collection.get_absolute_url }}"
+        },
+        {
+          "@type": "ListItem",
+          "position": 4,
+          "name": "{{ product.name }}",
+          "item": "{{ SITE_URL }}{{ product.get_absolute_url }}"
+        }
+        {% else %},
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "{{ product.name }}",
+          "item": "{{ SITE_URL }}{{ product.get_absolute_url }}"
+        }
+        {% endif %}
+      ]
+    }
+  ]
+}
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="container product-detail">
+
+  <!-- Breadcrumb -->
+  <nav class="breadcrumb" aria-label="Навигационная цепочка">
+    <a href="{% url 'home' %}" class="breadcrumb__link">Главная</a>
+    <span class="breadcrumb__sep" aria-hidden="true">›</span>
+    <a href="{% url 'catalog:list' %}" class="breadcrumb__link">Каталог</a>
+    {% if product.collection %}
+    <span class="breadcrumb__sep" aria-hidden="true">›</span>
+    <a href="{{ product.collection.get_absolute_url }}" class="breadcrumb__link">{{ product.collection.name }}</a>
+    {% endif %}
+    <span class="breadcrumb__sep" aria-hidden="true">›</span>
+    <span class="breadcrumb__current" aria-current="page">{{ product.name }}</span>
+  </nav>
+
+  <div class="product-detail__layout">
+
+    <!-- Галерея -->
+    <div class="product-gallery">
+      <div class="product-gallery__main" id="galleryMain">
+        {% with img=product.main_image %}
+        {% if img %}
+        <img src="{{ img.image.url }}" alt="{{ img.alt|default:product.name }}" class="product-gallery__main-img" id="mainImg" width="600" height="600">
+        {% else %}
+        <div class="product-gallery__placeholder">🦉</div>
+        {% endif %}
+        {% endwith %}
+        <div class="product-gallery__badges">
+          {% if product.is_hit %}<span class="badge badge--hit">Хит</span>{% endif %}
+          {% if product.is_new %}<span class="badge badge--new">Новинка</span>{% endif %}
+          {% if not product.in_stock %}<span class="badge badge--out">Под заказ</span>{% endif %}
+        </div>
+      </div>
+      {% if product.images.count > 1 %}
+      <div class="product-gallery__thumbs">
+        {% for img in product.images.all %}
+        <button class="product-gallery__thumb {% if forloop.first %}product-gallery__thumb--active{% endif %}"
+                data-src="{{ img.image.url }}"
+                onclick="switchImage(this)"
+                aria-label="Фото {{ forloop.counter }}">
+          <img src="{{ img.image.url }}" alt="{{ img.alt|default:product.name }}" loading="lazy" width="64" height="64">
+        </button>
+        {% endfor %}
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- Инфо -->
+    <div class="product-info">
+      {% if product.collection %}
+      <span class="product-info__collection">{{ product.collection.name }}</span>
+      {% endif %}
+      <h1 class="product-info__name">{{ product.name }}</h1>
+      <div class="product-info__price" itemprop="price" content="{{ product.price }}">{{ product.price|som }}</div>
+
+      {% if product.colors.exists %}
+      <div class="product-info__colors">
+        <p class="product-info__label">Цвет <span id="selectedColorName" class="product-info__selected-color"></span></p>
+        <div class="color-swatches" id="colorSwatches">
+          {% for color in product.colors.all %}
+          <button class="color-swatch-btn" data-color-id="{{ color.id }}" data-color-name="{{ color.name }}"
+                  style="--swatch-bg: {{ color.hex }}" title="{{ color.name }}"
+                  aria-label="{{ color.name }}"
+                  onclick="selectColor(this)">
+            <span class="color-swatch-btn__dot"></span>
+          </button>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+
+      <p class="product-info__description">{{ product.description }}</p>
+
+      <!-- Характеристики -->
+      <div class="product-specs">
+        {% if product.material %}<div class="spec"><span class="spec__label">Материал</span><span class="spec__value">{{ product.material }}</span></div>{% endif %}
+        {% if product.size %}<div class="spec"><span class="spec__label">Размер</span><span class="spec__value">{{ product.size }}</span></div>{% endif %}
+        {% if product.weight %}<div class="spec"><span class="spec__label">Вес</span><span class="spec__value">{{ product.weight }}</span></div>{% endif %}
+        {% if product.print_time %}<div class="spec"><span class="spec__label">Время печати</span><span class="spec__value">{{ product.print_time }}</span></div>{% endif %}
+        <div class="spec"><span class="spec__label">Наличие</span><span class="spec__value {% if product.in_stock %}spec__value--green{% else %}spec__value--orange{% endif %}">{% if product.in_stock %}В наличии{% else %}Под заказ{% endif %}</span></div>
+      </div>
+
+      <!-- Кнопки заказа -->
+      <div class="product-order">
+        <a href="#" class="btn btn--primary btn--large order-btn" id="orderBtn"
+           data-product="{{ product.name }}"
+           data-telegram="{{ telegram_username }}"
+           data-whatsapp="{{ whatsapp_phone }}">
+          Заказать
+        </a>
+        <a href="{% url 'orders:create' %}?product={{ product.pk }}" class="btn btn--outline btn--large">
+          Оформить заявку
+        </a>
+      </div>
+
+      <p class="product-info__note">💬 Или напишите нам — поможем с выбором цвета и размера.</p>
+    </div>
+  </div>
+
+  <!-- Похожие товары -->
+  {% if related %}
+  <section class="section related-products">
+    <h2 class="section__title">Похожие товары</h2>
+    <div class="products-grid">
+      {% for item in related %}
+        {% include 'partials/_product_card.html' with product=item %}
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function switchImage(btn) {
+  document.getElementById('mainImg').src = btn.dataset.src;
+  document.querySelectorAll('.product-gallery__thumb').forEach(b => b.classList.remove('product-gallery__thumb--active'));
+  btn.classList.add('product-gallery__thumb--active');
+}
+
+let selectedColorName = '';
+
+function selectColor(btn) {
+  document.querySelectorAll('.color-swatch-btn').forEach(b => b.classList.remove('color-swatch-btn--active'));
+  btn.classList.add('color-swatch-btn--active');
+  selectedColorName = btn.dataset.colorName;
+  document.getElementById('selectedColorName').textContent = '— ' + selectedColorName;
+  updateOrderLink();
+}
+
+function updateOrderLink() {
+  const btn = document.getElementById('orderBtn');
+  const product = btn.dataset.product;
+  const tg = btn.dataset.telegram;
+  const wa = btn.dataset.whatsapp;
+  const colorText = selectedColorName ? `, цвет: ${selectedColorName}` : '';
+  const text = encodeURIComponent(`Здравствуйте! Хочу заказать: ${product}${colorText}`);
+
+  if (tg) {
+    btn.href = `https://t.me/${tg}?text=${text}`;
+  } else if (wa) {
+    btn.href = `https://wa.me/${wa}?text=${text}`;
+  } else {
+    btn.href = "{% url 'orders:create' %}?product={{ product.pk }}";
+  }
+}
+
+document.addEventListener('DOMContentLoaded', updateOrderLink);
+</script>
+{% endblock %}

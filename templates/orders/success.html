@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block title %}Заказ принят — Bubo 3D Store{% endblock %}
+
+{% block content %}
+<div class="container page-content" style="text-align:center; padding: 4rem 1rem">
+  <div style="font-size: 4rem; margin-bottom: 1rem">🦉✅</div>
+  <h1 class="page-title">Заказ принят!</h1>
+  <p style="font-size: 1.1rem; color: var(--color-brown); max-width: 480px; margin: 0 auto 2rem">
+    Мы свяжемся с вами в ближайшее время для подтверждения заказа и согласования деталей.
+  </p>
+  <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap">
+    <a href="{% url 'home' %}" class="btn btn--primary">На главную</a>
+    <a href="{% url 'catalog:list' %}" class="btn btn--outline">Продолжить покупки</a>
+  </div>
+</div>
+{% endblock %}

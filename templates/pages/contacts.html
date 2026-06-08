@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% block title %}Контакты — Bubo 3D Store, Бишкек{% endblock %}
+{% block meta_description %}Контакты Bubo 3D Store: Telegram, WhatsApp, Instagram. Бишкек, Кыргызстан.{% endblock %}
+
+{% block content %}
+<div class="container page-content">
+  <h1 class="page-title">Контакты</h1>
+
+  <div class="contacts-layout">
+    <div class="contacts-info">
+      <div class="contact-item">
+        <span class="contact-item__icon">📍</span>
+        <div>
+          <strong>Город</strong>
+          <p>Бишкек, Кыргызстан</p>
+        </div>
+      </div>
+      <div class="contact-item">
+        <span class="contact-item__icon">✈️</span>
+        <div>
+          <strong>Telegram</strong>
+          <p><a href="https://t.me/BuboStore" class="link">@BuboStore</a></p>
+        </div>
+      </div>
+      <div class="contact-item">
+        <span class="contact-item__icon">📱</span>
+        <div>
+          <strong>WhatsApp</strong>
+          <p><a href="https://wa.me/996700000000" class="link">+996 700 000 000</a></p>
+        </div>
+      </div>
+      <div class="contact-item">
+        <span class="contact-item__icon">📸</span>
+        <div>
+          <strong>Instagram</strong>
+          <p><a href="https://instagram.com/bubostore.kg" class="link">@bubostore.kg</a></p>
+        </div>
+      </div>
+      <div class="contact-item">
+        <span class="contact-item__icon">⏰</span>
+        <div>
+          <strong>Время работы</strong>
+          <p>Пн–Сб: 10:00–19:00<br>Вс: по договорённости</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="contacts-cta">
+      <div class="cta-card">
+        <h2>Напишите нам</h2>
+        <p>Ответим на любые вопросы о товарах, доставке и индивидуальных заказах.</p>
+        <div class="cta-card__btns">
+          <a href="https://t.me/BuboStore" class="btn btn--primary">Написать в Telegram</a>
+          <a href="https://wa.me/996700000000" class="btn btn--outline">WhatsApp</a>
+        </div>
+      </div>
+      <div class="cta-card cta-card--light">
+        <h2>Индивидуальный заказ</h2>
+        <p>Хотите что-то особенное? Печатаем по вашим моделям и эскизам.</p>
+        <a href="{% url 'orders:create' %}" class="btn btn--primary">Оформить заявку</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

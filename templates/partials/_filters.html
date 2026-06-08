@@ -1,0 +1,47 @@
+{% load bubo_tags %}
+<form class="filters" method="get" action="{% url 'catalog:list' %}">
+  <div class="filters__group">
+    <label class="filters__label">Коллекция</label>
+    <div class="filters__options">
+      <a href="?{% query_transform collection=None %}" class="filters__option {% if not request.GET.collection %}filters__option--active{% endif %}">Все</a>
+      {% for col in collections %}
+      <a href="?{% query_transform collection=col.slug page=None %}" class="filters__option {% if request.GET.collection == col.slug %}filters__option--active{% endif %}">{{ col.name }}</a>
+      {% endfor %}
+    </div>
+  </div>
+
+  {% if colors %}
+  <div class="filters__group">
+    <label class="filters__label">Цвет</label>
+    <div class="filters__colors">
+      {% for color in colors %}
+      <a href="?{% query_transform color=color.id page=None %}" class="color-filter {% if request.GET.color == color.id|stringformat:'i' %}color-filter--active{% endif %}" title="{{ color.name }}">
+        <span class="color-dot" style="background:{{ color.hex }}"></span>
+      </a>
+      {% endfor %}
+      {% if request.GET.color %}
+      <a href="?{% query_transform color=None page=None %}" class="filters__reset-color">✕ сбросить</a>
+      {% endif %}
+    </div>
+  </div>
+  {% endif %}
+
+  <div class="filters__group">
+    <label class="filters__label">Поиск</label>
+    <input type="text" name="q" placeholder="Название товара..." value="{{ request.GET.q }}" class="filters__input filters__input--wide">
+    {% if request.GET.q %}
+    <a href="?{% query_transform q=None page=None %}" class="filters__reset-color">✕ сбросить</a>
+    {% endif %}
+  </div>
+
+  <div class="filters__group">
+    <label class="filters__label">Сортировка</label>
+    <select name="sort" class="filters__select" onchange="this.form.submit()">
+      <option value="-created_at" {% if request.GET.sort == '-created_at' or not request.GET.sort %}selected{% endif %}>Новинки</option>
+      <option value="price" {% if request.GET.sort == 'price' %}selected{% endif %}>Цена: по возрастанию</option>
+      <option value="-price" {% if request.GET.sort == '-price' %}selected{% endif %}>Цена: по убыванию</option>
+    </select>
+  </div>
+
+  <button type="submit" class="btn btn--primary btn--full" style="margin-top:.25rem">Применить</button>
+</form>

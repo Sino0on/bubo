@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+{% load bubo_tags %}
+
+{% block title %}{% spaceless %}
+{% if request.GET.q %}Поиск «{{ request.GET.q }}» — Bubo 3D Store
+{% elif request.GET.collection %}{% for col in collections %}{% if col.slug == request.GET.collection %}{{ col.name }} — купить в Бишкеке | Bubo 3D Store{% endif %}{% endfor %}
+{% else %}Каталог 3D-печатных товаров — Bubo 3D Store, Бишкек{% endif %}
+{% endspaceless %}{% endblock %}
+
+{% block meta_description %}{% if request.GET.collection %}{% for col in collections %}{% if col.slug == request.GET.collection %}Товары коллекции {{ col.name }} в Bubo 3D Store — игрушки и декор из 3D-печати. Доставка по Бишкеку и Кыргызстану. Печать на заказ.{% endif %}{% endfor %}{% else %}Каталог Bubo 3D Store — игрушки и декор для дома, напечатанные на 3D-принтере. Коллекции Bubo Play и Bubo Nest. Бишкек, Кыргызстан.{% endif %}{% endblock %}
+
+{% block meta_robots %}{% if request.GET.q or request.GET.color or request.GET.price_min or request.GET.price_max %}noindex, follow{% else %}index, follow{% endif %}{% endblock %}
+
+{# Canonical: только коллекция без прочих параметров фильтрации #}
+{% block canonical %}{{ SITE_URL }}/catalog/{% if request.GET.collection %}?collection={{ request.GET.collection }}{% endif %}{% endblock %}
+
+{% block extra_jsonld %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  "name": "{% if request.GET.collection %}{% for col in collections %}{% if col.slug == request.GET.collection %}{{ col.name }}{% endif %}{% endfor %}{% else %}Каталог{% endif %}",
+  "description": "Каталог Bubo 3D Store — игрушки и декор из 3D-печати. Бишкек.",
+  "url": "{{ SITE_URL }}/catalog/{% if request.GET.collection %}?collection={{ request.GET.collection }}{% endif %}",
+  "breadcrumb": {
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {"@type": "ListItem", "position": 1, "name": "Главная", "item": "{{ SITE_URL }}/"},
+      {"@type": "ListItem", "position": 2, "name": "Каталог", "item": "{{ SITE_URL }}/catalog/"}
+    ]
+  }
+}
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="catalog-page">
+  <div class="container">
+    <h1 class="page-title">
+      {% if request.GET.q %}
+        Поиск: «{{ request.GET.q }}»
+      {% elif request.GET.collection %}
+        {% for col in collections %}{% if col.slug == request.GET.collection %}{{ col.name }}{% endif %}{% endfor %}
+      {% else %}
+        Каталог
+      {% endif %}
+    </h1>
+
+    <div class="catalog-layout">
+      <aside class="catalog-sidebar" aria-label="Фильтры">
+        <button class="filters-toggle" id="filtersToggle">Фильтры и поиск ▾</button>
+        <div class="filters-wrap" id="filtersWrap">
+          {% include 'partials/_filters.html' %}
+        </div>
+      </aside>
+
+      <div class="catalog-main">
+        {% if products %}
+        <p class="catalog-count">Найдено: {{ paginator.count }} товаров</p>
+        <div class="products-grid">
+          {% for product in products %}
+            {% include 'partials/_product_card.html' %}
+          {% endfor %}
+        </div>
+
+        {% if is_paginated %}
+        <nav class="pagination" aria-label="Страницы каталога">
+          {% if page_obj.has_previous %}
+          <a href="?{% query_transform page=page_obj.previous_page_number %}" class="pagination__btn" rel="prev">← Назад</a>
+          {% endif %}
+
+          {% for num in paginator.page_range %}
+            {% if page_obj.number == num %}
+            <span class="pagination__btn pagination__btn--active" aria-current="page">{{ num }}</span>
+            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+            <a href="?{% query_transform page=num %}" class="pagination__btn">{{ num }}</a>
+            {% endif %}
+          {% endfor %}
+
+          {% if page_obj.has_next %}
+          <a href="?{% query_transform page=page_obj.next_page_number %}" class="pagination__btn" rel="next">Вперёд →</a>
+          {% endif %}
+        </nav>
+        {% endif %}
+
+        {% else %}
+        <div class="empty-state">
+          <div class="empty-state__icon">🦉</div>
+          <h2 class="empty-state__title">Ничего не найдено</h2>
+          <p class="empty-state__text">Попробуйте изменить фильтры или посмотрите весь каталог.</p>
+          <a href="{% url 'catalog:list' %}" class="btn btn--primary">Весь каталог</a>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

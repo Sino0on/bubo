@@ -1,0 +1,224 @@
+{% extends 'base.html' %}
+{% load static bubo_tags %}
+
+{% block title %}Bubo 3D Store — игрушки и декор из 3D-печати. Бишкек{% endblock %}
+{% block meta_description %}Bubo 3D Store — магазин игрушек и вещей для дома, напечатанных на 3D-принтере в Бишкеке. Коллекции Bubo Play и Bubo Nest. Печать на заказ, выбор цвета, доставка по Кыргызстану.{% endblock %}
+{% block meta_keywords %}3D печать Бишкек, игрушки 3D принтер купить, декор для дома 3D печать, Bubo 3D Store, 3D фигурки Кыргызстан, подарки на заказ Бишкек{% endblock %}
+{% block canonical %}{{ SITE_URL }}/{% endblock %}
+
+{% block extra_jsonld %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "LocalBusiness",
+  "name": "Bubo 3D Store",
+  "description": "Магазин игрушек и вещей для дома, напечатанных на 3D-принтере. Коллекции Bubo Play и Bubo Nest. Бишкек, Кыргызстан.",
+  "url": "{{ SITE_URL }}",
+  "logo": "{{ SITE_URL }}{% static 'img/logo.png' %}",
+  "image": "{{ SITE_URL }}{% static 'img/logo.png' %}",
+  "address": {
+    "@type": "PostalAddress",
+    "addressLocality": "Бишкек",
+    "addressRegion": "Чуйская область",
+    "addressCountry": "KG"
+  },
+  "geo": {
+    "@type": "GeoCoordinates",
+    "latitude": "42.8746",
+    "longitude": "74.5698"
+  },
+  "openingHoursSpecification": [
+    {
+      "@type": "OpeningHoursSpecification",
+      "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],
+      "opens": "10:00",
+      "closes": "19:00"
+    }
+  ],
+  "contactPoint": {
+    "@type": "ContactPoint",
+    "contactType": "customer service",
+    "availableLanguage": ["Russian", "Kyrgyz"]
+  },
+  "priceRange": "490 - 1490 сом",
+  "currenciesAccepted": "KGS",
+  "paymentAccepted": "Cash, Mobile Transfer",
+  "hasOfferCatalog": {
+    "@type": "OfferCatalog",
+    "name": "Каталог Bubo 3D Store",
+    "url": "{{ SITE_URL }}/catalog/"
+  }
+}
+</script>
+{% endblock %}
+
+{% block content %}
+
+<!-- Hero -->
+<section class="hero">
+  <div class="container hero__inner">
+    <div class="hero__text">
+      <h1 class="hero__title">Живые вещи<br>из 3D-печати</h1>
+      <p class="hero__subtitle">Игрушки и декор для дома, напечатанные на 3D-принтере. Выберите цвет — напечатаем специально для вас.</p>
+      <div class="hero__cta">
+        <a href="{% url 'catalog:list' %}" class="btn btn--primary btn--large">Смотреть каталог</a>
+        <a href="{% url 'pages:about' %}" class="btn btn--outline btn--large">О бренде</a>
+      </div>
+    </div>
+    <div class="hero__photo-wrap">
+      <img src="{% static 'img/banner.jpg' %}" alt="Bubo 3D Store — игрушки и декор из 3D-печати" class="hero__photo">
+      <div class="hero__bubbles">
+        <span class="bubble">Печать на заказ</span>
+        <span class="bubble">Выбор цвета</span>
+        <span class="bubble">Ручная работа</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Коллекции -->
+<section class="section collections">
+  <div class="container">
+    <h2 class="section__title">Наши коллекции</h2>
+    <div class="collections__grid">
+      {% for col in collections %}
+      <a href="{% url 'catalog:list' %}?collection={{ col.slug }}" class="collection-card">
+        <div class="collection-card__img">
+          {% if col.cover %}
+          <img src="{{ col.cover.url }}" alt="{{ col.name }}" loading="lazy">
+          {% else %}
+          <span class="collection-card__emoji">{% if 'play' in col.slug %}🧸{% else %}🏠{% endif %}</span>
+          {% endif %}
+        </div>
+        <div class="collection-card__body">
+          <h3 class="collection-card__name">{{ col.name }}</h3>
+          {% if col.description %}<p class="collection-card__desc">{{ col.description }}</p>{% endif %}
+          <span class="btn btn--outline btn--small">Смотреть</span>
+        </div>
+      </a>
+      {% empty %}
+      <a href="{% url 'catalog:list' %}?collection=bubo-play" class="collection-card">
+        <div class="collection-card__img"><span class="collection-card__emoji">🧸</span></div>
+        <div class="collection-card__body">
+          <h3 class="collection-card__name">Bubo Play</h3>
+          <p class="collection-card__desc">Игрушки и фигурки для детей и взрослых</p>
+          <span class="btn btn--outline btn--small">Смотреть</span>
+        </div>
+      </a>
+      <a href="{% url 'catalog:list' %}?collection=bubo-nest" class="collection-card">
+        <div class="collection-card__img"><span class="collection-card__emoji">🏠</span></div>
+        <div class="collection-card__body">
+          <h3 class="collection-card__name">Bubo Nest</h3>
+          <p class="collection-card__desc">Декор и полезные вещи для дома</p>
+          <span class="btn btn--outline btn--small">Смотреть</span>
+        </div>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- Хиты -->
+{% if hits %}
+<section class="section">
+  <div class="container">
+    <div class="section__header">
+      <h2 class="section__title">Хиты продаж 🔥</h2>
+      <a href="{% url 'catalog:list' %}?sort=-created_at" class="section__link">Все товары →</a>
+    </div>
+    <div class="products-grid">
+      {% for product in hits %}
+        {% include 'partials/_product_card.html' %}
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<!-- Новинки -->
+{% if news %}
+<section class="section section--tinted">
+  <div class="container">
+    <div class="section__header">
+      <h2 class="section__title">Новинки ✨</h2>
+      <a href="{% url 'catalog:list' %}?sort=-created_at" class="section__link">Все новинки →</a>
+    </div>
+    <div class="products-grid">
+      {% for product in news %}
+        {% include 'partials/_product_card.html' %}
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<!-- Как печатаем -->
+<section class="section how">
+  <div class="container">
+    <h2 class="section__title">Как мы делаем вещи</h2>
+    <div class="how__steps">
+      <div class="how__step">
+        <div class="how__step-icon">🎨</div>
+        <h3 class="how__step-title">Выбираете цвет</h3>
+        <p class="how__step-text">Укажите желаемый цвет при заказе — используем более 20 вариантов филамента.</p>
+      </div>
+      <div class="how__step">
+        <div class="how__step-icon">🖨️</div>
+        <h3 class="how__step-title">Печатаем для вас</h3>
+        <p class="how__step-text">Каждый товар печатается после заказа. Среднее время — 4–8 часов на принтере.</p>
+      </div>
+      <div class="how__step">
+        <div class="how__step-icon">✋</div>
+        <h3 class="how__step-title">Обрабатываем вручную</h3>
+        <p class="how__step-text">Шлифуем, убираем следы поддержек. Финальный контроль качества.</p>
+      </div>
+      <div class="how__step">
+        <div class="how__step-icon">📦</div>
+        <h3 class="how__step-title">Доставляем</h3>
+        <p class="how__step-text">Самовывоз в Бишкеке или доставка по городу и всему Кыргызстану.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="section section--tinted faq">
+  <div class="container">
+    <h2 class="section__title">Частые вопросы</h2>
+    <div class="faq__list">
+      <details class="faq__item">
+        <summary class="faq__question">Можно ли заказать любой цвет?</summary>
+        <p class="faq__answer">Да! У нас более 20 цветов филамента. Напишите при заказе — подберём максимально близкий к вашему пожеланию.</p>
+      </details>
+      <details class="faq__item">
+        <summary class="faq__question">Как долго ждать заказ?</summary>
+        <p class="faq__answer">Стандартный срок — 1–3 рабочих дня. Зависит от сложности и загрузки принтера. Вы получите уведомление, когда заказ готов.</p>
+      </details>
+      <details class="faq__item">
+        <summary class="faq__question">Из чего сделаны игрушки? Безопасно ли для детей?</summary>
+        <p class="faq__answer">Используем PLA-пластик — экологичный материал на основе кукурузного крахмала. Не содержит токсичных веществ, подходит для детей от 3 лет.</p>
+      </details>
+      <details class="faq__item">
+        <summary class="faq__question">Можно ли напечатать по своей модели?</summary>
+        <p class="faq__answer">Да! Принимаем файлы STL/OBJ. Свяжитесь с нами через Telegram или WhatsApp, обсудим детали и стоимость.</p>
+      </details>
+      <details class="faq__item">
+        <summary class="faq__question">Как осуществляется оплата?</summary>
+        <p class="faq__answer">Оплата наличными при получении или переводом на Mbank/O!Pay. Предоплата не требуется для стандартных товаров.</p>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- CTA банер -->
+<section class="section cta-banner">
+  <div class="container cta-banner__inner">
+    <div class="cta-banner__text">
+      <h2 class="cta-banner__title">Нужна особенная вещь?</h2>
+      <p class="cta-banner__subtitle">Напечатаем по вашей идее или модели. Подарки, декор, запчасти — всё возможно!</p>
+    </div>
+    <a href="{% url 'pages:contacts' %}" class="btn btn--primary btn--large">Написать нам</a>
+  </div>
+</section>
+
+{% endblock %}
