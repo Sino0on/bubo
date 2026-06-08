@@ -10,6 +10,10 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-production-!
 
 DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
+
+_csrf_raw = config("CSRF_TRUSTED_ORIGINS", default="")
+CSRF_TRUSTED_ORIGINS = [o for o in _csrf_raw.split(",") if o.strip()]
+
 ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
 
 INSTALLED_APPS = [
