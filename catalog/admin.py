@@ -56,9 +56,11 @@ class ProductAdmin(admin.ModelAdmin):
         ('Основная информация', {
             'fields': ('name', 'slug', 'collection', 'description', 'price')
         }),
+        ('Доступные цвета', {
+            'fields': ('colors',),
+        }),
         ('Характеристики', {
-            'fields': ('material', 'size', 'weight', 'print_time', 'colors'),
-            'classes': ('collapse',),
+            'fields': ('material', 'size', 'weight', 'print_time'),
         }),
         ('Статус', {
             'fields': ('in_stock', 'is_hit', 'is_new'),
