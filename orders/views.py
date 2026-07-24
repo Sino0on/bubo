@@ -1,11 +1,26 @@
+import logging
+from datetime import timedelta
+
 import requests
 from django.conf import settings
 from django.shortcuts import redirect, get_object_or_404
+from django.utils import timezone
 from django.views.generic import CreateView
 from django.urls import reverse_lazy
 from django.contrib import messages
 from .models import Order
 from .forms import OrderForm
+
+logger = logging.getLogger(__name__)
+
+RATE_LIMIT_SECONDS = 60
+
+
+def get_client_ip(request):
+    forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+    if forwarded_for:
+        return forwarded_for.split(',')[0].strip()
+    return request.META.get('REMOTE_ADDR')
 
 
 def send_telegram_notification(order):
@@ -27,7 +42,7 @@ def send_telegram_notification(order):
             timeout=5
         )
     except Exception:
-        pass
+        logger.exception('Failed to send Telegram notification for order #%s', order.pk)
 
 
 class OrderCreateView(CreateView):
@@ -37,7 +52,20 @@ class OrderCreateView(CreateView):
     success_url = reverse_lazy('orders:success')
 
     def form_valid(self, form):
-        order = form.save()
+        if form.is_honeypot_filled():
+            logger.warning('Order form honeypot triggered from IP %s', get_client_ip(self.request))
+            return redirect(self.success_url)
+
+        ip_address = get_client_ip(self.request)
+        if ip_address:
+            recent_cutoff = timezone.now() - timedelta(seconds=RATE_LIMIT_SECONDS)
+            if Order.objects.filter(ip_address=ip_address, created_at__gte=recent_cutoff).exists():
+                form.add_error(None, 'Вы уже отправили заказ недавно. Пожалуйста, подождите немного и попробуйте снова.')
+                return self.form_invalid(form)
+
+        order = form.save(commit=False)
+        order.ip_address = ip_address
+        order.save()
         send_telegram_notification(order)
         messages.success(self.request, 'Ваш заказ принят! Мы свяжемся с вами в ближайшее время.')
         return redirect(self.success_url)

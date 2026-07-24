@@ -37,6 +37,7 @@ class Order(models.Model):
         'Статус', max_length=20,
         choices=STATUS_CHOICES, default='new'
     )
+    ip_address = models.GenericIPAddressField('IP-адрес', null=True, blank=True)
     created_at = models.DateTimeField('Создан', auto_now_add=True)
 
     class Meta:

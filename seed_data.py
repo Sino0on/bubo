@@ -1,18 +1,23 @@
 """
-Seed initial demo data.
+Seed initial demo data. Dev/staging only — do not run against production.
 Run: python seed_data.py
 """
-import os, django
+import os, secrets, django
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'bubostore.settings')
 django.setup()
 
+from django.conf import settings
 from catalog.models import Collection, Color, Product
 from django.contrib.auth import get_user_model
 
+if not settings.DEBUG:
+    raise SystemExit('seed_data.py is for local/dev use only — refusing to run with DEBUG=False.')
+
 User = get_user_model()
 if not User.objects.filter(username='admin').exists():
-    User.objects.create_superuser('admin', 'admin@bubostore.kg', 'admin123')
-    print('✓ Superuser: admin / admin123')
+    password = os.environ.get('DJANGO_SUPERUSER_PASSWORD') or secrets.token_urlsafe(12)
+    User.objects.create_superuser('admin', 'admin@bubostore.kg', password)
+    print(f'✓ Superuser: admin / {password}')
 
 # Collections
 play, _ = Collection.objects.get_or_create(

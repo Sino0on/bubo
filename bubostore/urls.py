@@ -6,6 +6,7 @@ from django.contrib.sitemaps.views import sitemap
 from django.views.generic import TemplateView
 from catalog.sitemaps import StaticSitemap, CollectionSitemap, ProductSitemap
 from catalog.views import HomeView
+from bubostore.views import healthz
 
 sitemaps = {
     'static':      StaticSitemap,
@@ -14,13 +15,14 @@ sitemaps = {
 }
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path(settings.ADMIN_URL, admin.site.urls),
     path('', HomeView.as_view(), name='home'),
     path('catalog/', include('catalog.urls')),
     path('', include('pages.urls')),
     path('', include('orders.urls')),
     path('sitemap.xml', sitemap, {'sitemaps': sitemaps}, name='django.contrib.sitemaps.views.sitemap'),
     path('robots.txt', TemplateView.as_view(template_name='robots.txt', content_type='text/plain'), name='robots'),
+    path('healthz/', healthz, name='healthz'),
 ]
 
 if settings.DEBUG:
