@@ -2,13 +2,18 @@
 Seed initial demo data. Dev/staging only — do not run against production.
 Run: python seed_data.py
 """
-import os, secrets, django
+import os
+import secrets
+
+import django
+
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'bubostore.settings')
 django.setup()
 
 from django.conf import settings
-from catalog.models import Collection, Color, Product
 from django.contrib.auth import get_user_model
+
+from catalog.models import Collection, Color, Product
 
 if not settings.DEBUG:
     raise SystemExit('seed_data.py is for local/dev use only — refusing to run with DEBUG=False.')

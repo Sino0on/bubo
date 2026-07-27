@@ -3,13 +3,14 @@ from datetime import timedelta
 
 import requests
 from django.conf import settings
-from django.shortcuts import redirect, get_object_or_404
+from django.contrib import messages
+from django.shortcuts import redirect
+from django.urls import reverse_lazy
 from django.utils import timezone
 from django.views.generic import CreateView
-from django.urls import reverse_lazy
-from django.contrib import messages
-from .models import Order
+
 from .forms import OrderForm
+from .models import Order
 
 logger = logging.getLogger(__name__)
 

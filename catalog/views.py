@@ -1,6 +1,7 @@
-from django.views.generic import TemplateView, ListView, DetailView
 from django.db.models import Q
-from .models import Product, Collection, Color
+from django.views.generic import DetailView, ListView, TemplateView
+
+from .models import Collection, Color, Product
 
 
 class HomeView(TemplateView):

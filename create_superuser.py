@@ -5,7 +5,9 @@ in the environment (see .env.example) — no hardcoded credentials.
 """
 import os
 import sys
+
 import django
+
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'bubostore.settings')
 django.setup()
 

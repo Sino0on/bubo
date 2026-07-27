@@ -1,13 +1,18 @@
 import os
 from pathlib import Path
+
 from django.core.exceptions import ImproperlyConfigured
 from dotenv import load_dotenv
+
+from bubostore.config.sentry import init_sentry
 
 load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 DEBUG = os.environ.get('DEBUG', 'False') == 'True'
+
+init_sentry(debug=DEBUG)
 
 SECRET_KEY = os.environ.get('SECRET_KEY', '')
 if not SECRET_KEY:
@@ -69,8 +74,16 @@ TEMPLATES = [
 WSGI_APPLICATION = 'bubostore.wsgi.application'
 
 if os.environ.get('DATABASE_URL'):
-    import dj_database_url
-    DATABASES = {'default': dj_database_url.config(conn_max_age=600)}
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql_psycopg2",
+            "NAME": os.environ.get("POSTGRES_DB", default="bsv"),
+            "USER": os.environ.get("POSTGRES_USER", default="bsv_user"),
+            "PASSWORD": os.environ.get("POSTGRES_PASSWORD", default="qwerty2003"),
+            "HOST": os.environ.get("POSTGRES_HOST", default=""),
+            "PORT": os.environ.get("POSTGRES_PORT", default="5432"),
+        }
+    }
 else:
     DATABASES = {
         'default': {
@@ -136,16 +149,3 @@ LOGGING = {
         'level': os.environ.get('DJANGO_LOG_LEVEL', 'INFO'),
     },
 }
-
-SENTRY_DSN = os.environ.get('SENTRY_DSN', '')
-if SENTRY_DSN:
-    import sentry_sdk
-    from sentry_sdk.integrations.django import DjangoIntegration
-
-    sentry_sdk.init(
-        dsn=SENTRY_DSN,
-        integrations=[DjangoIntegration()],
-        traces_sample_rate=0.1,
-        send_default_pii=False,
-        environment=os.environ.get('ENVIRONMENT', 'production'),
-    )

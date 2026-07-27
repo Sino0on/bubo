@@ -1,12 +1,13 @@
-from django.contrib import admin
-from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from django.contrib import admin
 from django.contrib.sitemaps.views import sitemap
+from django.urls import include, path
 from django.views.generic import TemplateView
-from catalog.sitemaps import StaticSitemap, CollectionSitemap, ProductSitemap
-from catalog.views import HomeView
+
 from bubostore.views import healthz
+from catalog.sitemaps import CollectionSitemap, ProductSitemap, StaticSitemap
+from catalog.views import HomeView
 
 sitemaps = {
     'static':      StaticSitemap,

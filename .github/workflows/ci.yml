@@ -30,22 +30,29 @@ jobs:
       SECRET_KEY: ci-test-secret-key-not-for-production-0123456789abcdefghijklmnop
       ALLOWED_HOSTS: localhost,127.0.0.1
       DATABASE_URL: postgresql://bubostore:bubostore@localhost:5432/bubostore_test
+      POSTGRES_DB: bubostore_test
+      POSTGRES_USER: bubostore
+      POSTGRES_PASSWORD: bubostore
+      POSTGRES_HOST: localhost
+      POSTGRES_PORT: 5432
 
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v5
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
         with:
+          enable-cache: true
           python-version: "3.13"
 
       - name: Install dependencies
-        run: pip install -r requirements.txt
+        run: uv sync --locked
 
       - name: Run migrations
-        run: python manage.py migrate --noinput
+        run: uv run python manage.py migrate --noinput
 
       - name: Run tests
-        run: python manage.py test
+        run: uv run python manage.py test
 
       - name: Django deployment checks
-        run: python manage.py check --deploy --fail-level WARNING
+        run: uv run python manage.py check --deploy --fail-level WARNING

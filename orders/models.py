@@ -1,5 +1,6 @@
 from django.db import models
-from catalog.models import Product, Color
+
+from catalog.models import Color, Product
 
 
 class Order(models.Model):
