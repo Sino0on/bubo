@@ -2,7 +2,7 @@ services:
   web:
     build: .
     ports:
-      - "127.0.0.1:8114:8114"
+      - "127.0.0.1:8032:8032"
     volumes:
       - media_volume:/app/media
       - static_volume:/app/staticfiles
