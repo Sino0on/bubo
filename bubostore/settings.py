@@ -74,13 +74,20 @@ TEMPLATES = [
 WSGI_APPLICATION = 'bubostore.wsgi.application'
 
 if os.environ.get('DATABASE_URL'):
+    _postgres_host = os.environ.get("POSTGRES_HOST", default="")
+    if not DEBUG and not _postgres_host:
+        raise ImproperlyConfigured(
+            'POSTGRES_HOST is not set. With DEBUG=False, an empty host makes psycopg2 '
+            'try a local unix socket instead of the "db" container — set POSTGRES_HOST '
+            '(e.g. POSTGRES_HOST=db to match the docker-compose service name) in .env.'
+        )
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.postgresql_psycopg2",
             "NAME": os.environ.get("POSTGRES_DB", default="bsv"),
             "USER": os.environ.get("POSTGRES_USER", default="bsv_user"),
             "PASSWORD": os.environ.get("POSTGRES_PASSWORD", default="qwerty2003"),
-            "HOST": os.environ.get("POSTGRES_HOST", default=""),
+            "HOST": _postgres_host,
             "PORT": os.environ.get("POSTGRES_PORT", default="5432"),
         }
     }
